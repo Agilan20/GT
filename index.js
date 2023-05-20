@@ -6,6 +6,7 @@ const fs = require("fs");
 const dataFile = require("./data.json");
 const staticPath = path.join(__dirname, "./public")
 app.use(express.json());
+app.use(express.urlencoded())
 app.set('view engine', 'ejs')
 app.use(express.static("public"));
 const chromaticNumber = require("./chrom")
@@ -153,7 +154,20 @@ app.get("/visualize", (req, res) => {
     } catch (error) {
         console.log(error)
     }
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
 
+    let currentDay = String(date.getDate()).padStart(2, '0');
+    let currentMonth = String(date.getMonth() + 1).padStart(2, "0");
+    let currentYear = date.getFullYear();
+
+    // we will display the date as DD-MM-YYYY 
+
+    let currentDate = `${currentDay}-${currentMonth}-${currentYear}`;
+
+    data = data.filter((x) => x.date === currentDate)
+
+    console.log(data.length)
 
     //let N be the number of nodes
     let N = data.length;
