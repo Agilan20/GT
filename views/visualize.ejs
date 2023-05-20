@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="chef.png" type="image/icon type">
+    <title>Graph Visualization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            /* align-items: center; */
+            justify-content: center;
+        }
+
+        #cy {
+            width: 50%;
+            height: 100%;
+            /* position: absolute; */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* top: 0;
+            left: 0%; */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .card {
+            background: #fff;
+            width: 430px;
+            padding: 20px;
+            pointer-events: none;
+            position: absolute;
+            border-radius: 100px 20px 20px 100px;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .card .cardInside {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card .content {
+            display: flex;
+            align-items: center;
+        }
+
+        .card .img {
+            height: 90px;
+            width: 90px;
+            position: absolute;
+            left: -5px;
+            background: #fff;
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .card .img img {
+            height: 100%;
+            width: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .card .details {
+            margin-left: 80px;
+        }
+
+        .details span {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .card a {
+            text-decoration: none;
+            font-size: 18px;
+            padding: 7px 18px;
+            border-radius: 25px;
+            color: #fff;
+            background: linear-gradient(to bottom, #bea2e7 0%, #86b7e7 100%);
+            transition: all 0.3s ease;
+        }
+
+        .card a:hover {
+            transform: scale(0.94);
+        }
+
+        .timings span {
+            font-weight: 400;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <% const myObjectActual=response; %>
+        <% const myObjectData=data; %>
+
+            <%- include('navbar.ejs') -%>
+                <div id="cy"></div>
+                <div class="card popup" style="display: none;">
+                    <div class="cardInside">
+                        <div class="content">
+                            <div class="img"><img src="user.png" alt=""></div>
+                            <div class="details">
+                                <span class="cardName">Agilan</span>
+                                <p class="timings">
+                                    <span class="fromTime">
+                                        09:00
+                                    </span>
+                                    to
+                                    <span class="toTime">
+                                        10:00
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        <a href="#">Booked</a>
+                    </div>
+                </div>
+
+                <script src="https://unpkg.com/cytoscape@3.20.0/dist/cytoscape.min.js"></script>
+
+                <script src="https://unpkg.com/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+
+
+                <script>
+
+                    document.addEventListener('DOMContentLoaded', function () {
+
+
+                        var result = []
+                        var userDetails = []
+                        let temporaryUserDetails = null;
+                        "<% for(let i=0;i<myObjectData.length;i++){ %>"
+                        var username = "<%= myObjectData[i]['username'] %>"
+                        var arr = "<%= myObjectData[i]['arr'] %>"
+                        var dep = "<%= myObjectData[i]['dep'] %>"
+
+                        var temp = ""
+                        if (arr.length == 3) {
+                            temp += 0; temp+=arr[0];
+                            temp += ':'; temp+=arr[1]; temp+=arr[2];
+                        } else {
+                            temp += arr[0]; temp+=arr[1];
+                            temp += ':'; temp+=arr[2]; temp+=arr[3];
+                        }
+
+                        arr = temp;
+                        temp=""
+                        if (dep.length == 3) {
+                            temp += 0; temp+=dep[0];
+                            temp += ':'; temp+=dep[1]; temp+=dep[2];
+                        } else {
+                            temp += dep[0]; temp+=dep[1];
+                            temp += ':'; temp+=dep[2]; temp+=dep[3];
+                        }
+                        dep = temp;
+                        temp=""
+
+                        temporaryUserDetails = {
+                            "username": username,
+                            "arrival": arr,
+                            "departure": dep
+                        }
+                        userDetails.push(temporaryUserDetails)
+                        "<% } %>"
+
+
+                        var j = 0;
+                        "<% for(let i=0;i<myObjectActual.length;i++){ %>"
+                        var group = "<%= myObjectActual[i]['group'] %>"
+                        if (group == 'nodes') {
+                            var id = "<%= myObjectActual[i]['id'] %>"
+                            var color = "<%= myObjectActual[i]['color'] %>"
+                            var bg = "<%= myObjectActual[i]['bg'] %>"
+                            var x = "<%= myObjectActual[i]['x'] %>"
+                            var y = "<%= myObjectActual[i]['y'] %>"
+                            let tempUserDetails = userDetails[j];
+                            j = j + 1;
+                            let tempNode = {
+                                group: group,
+                                data: {
+                                    id: id,
+                                    username: tempUserDetails.username,
+                                    arrival: tempUserDetails.arrival,
+                                    departure: tempUserDetails.departure,
+                                    color: color,
+                                    bg: bg
+                                },
+                                position: {
+                                    x: Number(x),
+                                    y: Number(y)
+                                }
+                            }
+                            result.push(tempNode);
+                        } else {
+                            var id = "<%= myObjectActual[i]['id'] %>"
+                            var source = "<%= myObjectActual[i]['source'] %>"
+                            var target = "<%= myObjectActual[i]['target'] %>"
+                            var label = "<%= myObjectActual[i]['label'] %>"
+
+                            let tempEdge = {
+                                group: group,
+                                data: {
+                                    id: id,
+                                    source: source,
+                                    target: target,
+                                    label: label
+                                }
+                            }
+                            result.push(tempEdge);
+                        }
+
+                        "<% } %>"
+
+
+                        console.log(result)
+                        var cy = cytoscape({
+                            container: document.getElementById('cy'),
+
+                            elements: [
+                            ],
+
+                            style: [
+                                {
+                                    selector: 'node',
+                                    style: {
+                                        'background-color': 'data(bg)',
+                                        'label': 'data(id)',
+                                        'text-valign': 'center',
+                                        'text-halign': 'center',
+                                        'color': 'data(color)',
+                                        'font-size': '16px'
+                                    }
+                                },
+                                {
+                                    selector: 'edge',
+                                    style: {
+                                        'width': 3,
+                                        'line-color': '#ccc',
+                                        'target-arrow-color': '#ccc',
+                                        'target-arrow-shape': 'triangle',
+                                        'curve-style': 'bezier'
+                                    }
+                                },
+                                {
+                                    selector: '.node::before, .node::after, .edge::before',
+                                    style: {
+                                        'content': '',
+                                        'position': 'absolute',
+                                        'z-index': '-1',
+                                        'width': '100%',
+                                        'height': '100%',
+                                        'background-color': 'blue',
+                                        'border-radius': '50%'
+                                    }
+                                }
+                            ],
+
+                            layout: {
+                                name: 'circle'
+                            }
+                        });
+
+                        cy.add(
+                            result
+                        );
+                        var popperInstance;
+
+                        // Function to show the popup on node hover
+                        function showPopup(node) {
+                            var popup = document.querySelector('.popup');
+                            var cardName = document.querySelector('.cardName');
+                            cardName.textContent = node.data('username');
+
+                            var fromTime = document.querySelector('.fromTime');
+                            fromTime.textContent = node.data('arrival');
+
+                            var toTime = document.querySelector('.toTime');
+                            toTime.textContent = node.data('departure');
+                            popup.style.display = 'block';
+
+                            // Position the popup near the node
+                            var nodePosition = node.renderedPosition();
+                            var xAxis = nodePosition.x + 355;
+                            var yAxis = nodePosition.y + 55;
+                            console.log(xAxis)
+                            var reference = {
+                                getBoundingClientRect: function () {
+                                    return {
+                                        width: 0,
+                                        height: 0,
+                                        top: yAxis,
+                                        right: xAxis,
+                                        bottom: yAxis,
+                                        left: xAxis,
+                                    };
+                                },
+                            };
+
+                            popperInstance = Popper.createPopper(reference, popup, {
+                                placement: 'right',
+                                modifiers: [
+                                    {
+                                        name: 'offset',
+                                        options: {
+                                            offset: [0, 8],
+                                        },
+                                    },
+                                ],
+                            });
+                        }
+
+                        // Function to hide the popup on node mouseout
+                        function hidePopup() {
+                            var popup = document.querySelector('.popup');
+                            popup.style.display = 'none';
+                        }
+
+                        // Attach event listeners for showing/hiding the popup
+                        cy.on('mouseover', 'node', function (event) {
+                            showPopup(event.target);
+                        });
+
+                        cy.on('mouseout', 'node', function (event) {
+                            hidePopup();
+                        });
+
+                    });
+
+                </script>
+
+
+</body>
+
+</html>

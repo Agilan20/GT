@@ -1,0 +1,42 @@
+[
+    {
+        "color": "white",
+        "bg": "blue"
+    },
+    {
+        "color": "white",
+        "bg": "red"
+    },
+    {
+        "color": "white",
+        "bg": "black"
+    },
+    {
+        "color": "white",
+        "bg": "green"
+    },
+    {
+        "color": "white",
+        "bg": "yellow"
+    },
+    {
+        "color": "black",
+        "bg": "pink"
+    },
+    {
+        "color": "white",
+        "bg": "#6a5acd"
+    },
+    {
+        "color": "white",
+        "bg": "#bebebe"
+    },
+    {
+        "color": "white",
+        "bg": "#996347"
+    },
+    {
+        "color": "white",
+        "bg": "#991947"
+    }
+]
